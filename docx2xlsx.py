@@ -91,6 +91,9 @@ def get_the_exactly_table(tables):
 
     return None
 
+def get_raw_text(cell, row, col) :
+    return cell(row, col).text
+
 def get_clean_text(cell, row, col) :
     txt = cell(row, col).text
     return "".join(txt.split())
@@ -101,9 +104,6 @@ def transfer(docxs_dir, output_file, config_file):
     #Create a workbook and add a worksheet.
     workbook = xlsxwriter.Workbook(output_file)
     worksheet = workbook.add_worksheet()
-    out_row = 1 # row 0 for title
-    out_col = 0
-    out_row0_done = False
     cell_format = workbook.add_format()
     cell_format.set_text_wrap()
     cell_format.set_align('center')
@@ -117,7 +117,7 @@ def transfer(docxs_dir, output_file, config_file):
         filename = os.fsdecode(file)
 
         title_has_wrote = False
-        if filename.endswith(".docx") or filename.endswith(".doc"):
+        if filename.endswith(".docx") : # or filename.endswith(".doc"): cannot handle doc files
             path_file = os.path.join(docxs_dir, filename)
             document = Document(path_file)
             table = get_the_exactly_table(document.tables)
@@ -146,7 +146,7 @@ def transfer(docxs_dir, output_file, config_file):
 
                 xlsx_col = to.get('col_start')
                 for c in docx_values :
-                    txt = get_clean_text(table.cell, docx_row, c)
+                    txt = get_raw_text(table.cell, docx_row, c)
                     # print("[%s]" % txt)
                     worksheet.write(xlsx_row, xlsx_col, txt, cell_format)
                     xlsx_col += 1
@@ -157,121 +157,7 @@ def transfer(docxs_dir, output_file, config_file):
             
     workbook.close()
 
-
 if __name__ == "__main__" :
     
     opts = parse_options()
     transfer(opts.docxs_dir, opts.output_file, opts.config_file)
-
-# Load the first table from your document. In your example file,
-# there is only one table, so I just grab the first one.
-# document = Document('test.docx')
-# table = document.tables[0]
-
-
-# Create a workbook and add a worksheet.
-# workbook = xlsxwriter.Workbook(os.path.join(directory, '九三学社青工委委员推荐表.xlsx'))
-# worksheet = workbook.add_worksheet()
-# out_row = 1 # row 0 for title
-# out_col = 0
-# out_row0_done = False
-# cell_format = workbook.add_format()
-# cell_format.set_text_wrap()
-# cell_format.set_align('center')
-# cell_format.set_align('vcenter')
-# # cell_format.set_align('vjustify')
-
-# for file in os.listdir(directory):
-#     filename = os.fsdecode(file)
-#     if filename.endswith(".docx"):
-#         print(os.path.join(directory, filename))
-#         document = Document(os.path.join(directory, filename))
-#         table = document.tables[0]
-
-#         count = len(table.rows)
-
-#         if count == 11 :
-
-#             if not out_row0_done:
-#                 out_col = 0
-#                 for v in keys :
-#                     txt = table.cell(v[0], v[1]).text
-#                     txt = "".join(txt.split())
-#                     cell_width = len(txt)
-
-#                     worksheet.set_column(0, out_col, cell_width)
-#                     worksheet.write(0, out_col, txt, cell_format)
-#                     out_col += 1
-#                 out_row0_done = True
-
-#                 # print("[%s] \n" % txt)
-
-#             out_col = 0
-#             for v in vals :
-#                 txt = table.cell(v[0], v[1]).text.strip()
-#                 worksheet.write(out_row, out_col, txt, cell_format)
-
-#                 # print("[%s] \n" % txt)
-#                 out_col += 1
-
-#             out_row += 1
-
-#         elif count == 10 :
-#             out_col = 0
-#             wrote_col_10 = False
-#             for v in val2s :
-#                 txt = table.cell(v[0], v[1]).text.strip()
-
-#                 # if v[0] == politicalparty_row and v[1] == politicalparty_col :
-#                 #     out_col += 1
-#                 # elif v[0] == join_row and v[1]==join_col :
-#                 #     worksheet.write(out_row, out_col + 3, txt)
-#                 #     continue
-#                 # elif v[0] == specialtitle_row and v[1] == specialtitle_col :
-#                 #     out_col += 2
-
-#                 if out_col == 6:
-#                     out_col += 1
-#                 elif out_col == 8 :
-#                     if not wrote_col_10:
-#                         worksheet.write(out_row, 10, txt, cell_format)
-#                         wrote_col_10 = True
-#                         continue
-#                 elif out_col == 9:
-#                     out_col += 3
-
-#                 worksheet.write(out_row, out_col, txt, cell_format)
-
-#                 # print("[%s] \n" % txt)
-#                 out_col += 1
-
-#             out_row += 1
-
-#         else :
-
-#             print("rows in %s is :%d, failed to handle it!!!" % (filename, count))
-
-# workbook.close()
-
-# # Data will be a list of rows represented as dictionaries
-# # containing each row's data.
-# # data = []
-# #
-# # keys = None
-# # for i, row in enumerate(table.rows):
-# #     # text = (cell.text for cell in row.cells)
-# #     print("Line %d :" % i)
-# #     for cell in row.cells :
-# #         print("[%s]" % cell.text)
-#     # Establish the mapping based on the first row
-#     # headers; these will become the keys of our dictionary
-#     # if i == 0:
-#     #     keys = tuple(text)
-#     #     continue
-
-#     # Construct a dictionary for this row, mapping
-#     # keys to values for this row
-#     # row_data = dict(zip(keys, text))
-#     # data.append(row_data)
-
-# # print(data)
